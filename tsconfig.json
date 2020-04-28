@@ -15,7 +15,11 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@stumpam/ngx-masked-input": [
+        "libs/ngx-masked-input/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

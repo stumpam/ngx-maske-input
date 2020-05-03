@@ -10,11 +10,15 @@ import { MaskedInputOptions } from '@stumpam/ngx-masked-input';
 export class AppComponent {
   title = 'demo';
 
-  ctrl = new FormControl();
+  ctrl = new FormControl(null, {updateOn: 'blur'});
 
   options1: Partial<MaskedInputOptions> = {
     type: 'numeric',
     suffix: 'Kč',
     min: 1,
   };
+
+  constructor() {
+    this.ctrl.valueChanges.subscribe(console.log);
+  }
 }

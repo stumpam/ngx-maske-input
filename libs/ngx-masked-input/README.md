@@ -49,6 +49,8 @@ options: MaskedInputOptions = {
   max: number;
   // Emit just number without prefix or suffix, default true
   emitNumber: boolean;
+  // If true leaves at first input empty, default false
+  startEmpty: boolean;
 };
 ```
 

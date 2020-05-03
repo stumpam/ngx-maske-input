@@ -12,35 +12,9 @@ export class AppComponent {
 
   ctrl = new FormControl();
 
-  options1: MaskedInputOptions = [
-    { type: 'numeric', value: 0, showZero: true },
-    { type: 'static', value: ' Kč', visibleIfEmpty: true },
-  ];
-  options3: MaskedInputOptions = [{ type: 'numeric' }];
-  options2: MaskedInputOptions = [
-    {
-      type: 'static',
-      value: '+42',
-      includeInModel: true,
-      hideUntouched: true,
-    },
-    {
-      type: 'numeric',
-      min: 0,
-      max: 1,
-      value: 0,
-      hideUntouched: true,
-    },
-    {
-      type: 'static',
-      value: ' ',
-      includeInModel: true,
-      hideUntouched: true,
-    },
-    {
-      type: 'numeric',
-      min: 1e8,
-      max: 999999999,
-    },
-  ];
+  options1: Partial<MaskedInputOptions> = {
+    type: 'numeric',
+    suffix: 'Kč',
+    min: 1,
+  };
 }

@@ -43,6 +43,8 @@ export const MASKED_VALUE_ACCESSOR: any = {
 export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   @ViewChild('field', { static: true }) field: ElementRef<HTMLInputElement>;
 
+  @Input() attributes = {} as Record<string, unknown>;
+
   @Input() set options(options: Partial<MaskedInputOptions>) {
     if (
       this._options.type &&
@@ -94,6 +96,14 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     if (!this._options.type) {
       throw new Error('Input type must be defined');
     }
+
+    Object.entries(this.attributes).forEach(([attr, value]) => {
+      this.renderer.setAttribute(
+        this.field.nativeElement,
+        attr,
+        value.toString(),
+      );
+    });
   }
 
   onInput(value: string) {

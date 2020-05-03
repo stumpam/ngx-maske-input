@@ -16,6 +16,7 @@ export class AppComponent {
     type: 'numeric',
     suffix: 'Kč',
     min: 1,
+    startEmpty: true
   };
 
   constructor() {

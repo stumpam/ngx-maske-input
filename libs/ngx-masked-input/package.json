@@ -1,9 +1,30 @@
 {
-  "name": "@ngx-masked-input/ngx-masked-input",
-  "version": "0.0.1",
+  "name": "@stumpam/ngx-masked-input",
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "Angular Date picker with masked input.",
+  "homepage": "https://github.com/stumpam/ngx-masked-input",
+  "author": "Martin Štumpa (https://github.com/stumpam)",
+  "keywords": [
+    "ng",
+    "angular",
+    "library",
+    "masked",
+    "input",
+    "numeric",
+    "prefix",
+    "postfix"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stumpam/ngx-masked-input"
+  },
+  "bugs": {
+    "url": "https://github.com/stumpam/ngx-masked-input/issues"
+  },
   "peerDependencies": {
-    "@angular/common": "^9.1.0",
-    "@angular/core": "^9.1.0",
+    "@angular/common": "^9.0.0",
+    "@angular/core": "^9.0.0",
     "tslib": "^1.10.0"
   }
 }

@@ -1,84 +1,71 @@
 # NgxMaskedInput
 
-This project was generated using [Nx](https://nx.dev).
+Angular Date masked input for now just for numbers. It can handle string prefixes and suffixes;
 
-<p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" width="450"></p>
 
-🔎 **Nx is a set of Extensible Dev Tools for Monorepos.**
+## Quick Start
 
-## Quick Start & Documentation
+1. Import NgxMaskedInputModule to your project.
 
-[Nx Documentation](https://nx.dev/angular)
+```typescript
+import { NgxMaskedInputModule } from '@stumpam/ngx-masked-input';
 
-[10-minute video showing all Nx features](https://nx.dev/angular/getting-started/what-is-nx)
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule, NgxMaskedInputModule, ReactiveFormsModule],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+```
 
-[Interactive Tutorial](https://nx.dev/angular/tutorial/01-create-application)
+2. Use in HTML template
 
-## Adding capabilities to your workspace
+```typescript
+<ngx-masked-input [formControl]="ctrl" [options]="options"></ngx-masked-input>
+```
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+3. Set up in parent component
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+```typescript
+options: DateInputOptions = {
+  // For now just for numeric inputs!
+  type: 'numeric';
+  prefix: string;
+  appendPrefix: boolean;
+  suffix: string;
+  prependSuffix: boolean;
+  float: boolean;
+  floatSeparator: string;
+  precision: number;
+  separateThousands: boolean;
+  separator: string;
+  leadingZero: boolean;
+  enableEmpty: boolean;
+  min: number;
+  max: number;
+};
+```
 
-Below are some plugins which you can add to your workspace:
+### Works with [formly](https://formly.dev)
 
-- [Angular](https://angular.io)
-  - `ng add @nrwl/angular`
-- [React](https://reactjs.org)
-  - `ng add @nrwl/react`
-- Web (no framework frontends)
-  - `ng add @nrwl/web`
-- [Nest](https://nestjs.com)
-  - `ng add @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `ng add @nrwl/express`
-- [Node](https://nodejs.org)
-  - `ng add @nrwl/node`
+If you want to add attributes directly to input element make custom Formly field and initialize it on `ngOnInit`
 
-## Generate an application
+```typescript
+ngOnInit() {
+    this.attributes = {
+      id: this.id,
+      ...this.to.attributes,
+    };
+  }
+```
 
-Run `ng g @nrwl/angular:app my-app` to generate an application.
+and use it in the template
 
-> You can use any of the plugins above to generate applications as well.
+```HTML
+<ngx-date-input [formControl]="formControl" [options]="to.dateOptions" [attributes]="attributes"></ngx-date-input>
+```
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
-
-## Generate a library
-
-Run `ng g @nrwl/angular:lib my-lib` to generate a library.
-
-> You can also use any of the plugins above to generate libraries as well.
-
-Libraries are sharable across libraries and applications. They can be imported from `@ngx-masked-input/mylib`.
-
-## Development server
-
-Run `ng serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng g component my-component --project=my-app` to generate a new component.
-
-## Build
-
-Run `ng build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
+> ⚠ Caution
+>
+> Attributes are bound just once on ngOnIput hook. Changes are matter of future improvements.

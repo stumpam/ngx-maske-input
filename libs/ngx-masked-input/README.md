@@ -47,6 +47,8 @@ options: DateInputOptions = {
   min: number;
   // Maximum number
   max: number;
+  // Emit just number without prefix or suffix, default true
+  emitNumber: boolean;
 };
 ```
 

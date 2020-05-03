@@ -1,16 +1,14 @@
 import {
-  ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Directive,
   ElementRef,
   EventEmitter,
   forwardRef,
+  Injector,
   Input,
   OnInit,
   Output,
   Renderer2,
-  ViewChild,
-  ViewEncapsulation,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -22,29 +20,18 @@ export const MASKED_VALUE_ACCESSOR: any = {
   multi: true,
 };
 
-@Component({
-  selector: 'ngx-masked-input',
-  template: `<input
-    #field
-    type="string"
-    (blur)="onBlur()"
-    [disabled]="disabled"
-  />`,
-  providers: [MASKED_VALUE_ACCESSOR],
+@Directive({
+  selector: '[ngxMaskedInput]',
   // tslint:disable-next-line: no-host-metadata-property
   host: {
+    '(blur)': 'onBlur()',
     '(input)': 'onInput($event.target.value)',
     '(click)': 'onClick($event.target.value)',
     '(keydown)': 'onKeyDown($event)',
   },
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [MASKED_VALUE_ACCESSOR],
 })
 export class MaskedInputComponent implements ControlValueAccessor, OnInit {
-  @ViewChild('field', { static: true }) field: ElementRef<HTMLInputElement>;
-
-  @Input() attributes = {} as Record<string, unknown>;
-
   @Input() set options(options: Partial<MaskedInputOptions>) {
     if (
       this._options.type &&
@@ -91,20 +78,13 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   constructor(
     private readonly cd: ChangeDetectorRef,
     private readonly renderer: Renderer2,
+    private readonly field: ElementRef<HTMLInputElement>,
   ) {}
 
   ngOnInit(): void {
     if (!this._options.type) {
       throw new Error('Input type must be defined');
     }
-
-    Object.entries(this.attributes).forEach(([attr, value]) => {
-      this.renderer.setAttribute(
-        this.field.nativeElement,
-        attr,
-        value.toString(),
-      );
-    });
   }
 
   onInput(value: string) {
@@ -217,6 +197,8 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   }
 
   checkRange(value: string, key = false) {
+    if (!value) return;
+
     const suffixPosition =
       value.length -
       (this._options.suffix?.length + +this._options.prependSuffix) -
@@ -255,7 +237,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
       this.onInput(this._options.max.toString());
     }
 
-    this.blurred.emit();
+    this.touchedFn();
   }
 
   updateValue(value: string) {

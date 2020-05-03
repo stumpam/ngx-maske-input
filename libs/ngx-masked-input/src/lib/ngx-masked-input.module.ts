@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { MaskedInputComponent } from './components/masked-input/masked-input.component';
+import { MaskedInputComponent } from './directives/masked-input/masked-input.directive';
 
 @NgModule({
   imports: [CommonModule],

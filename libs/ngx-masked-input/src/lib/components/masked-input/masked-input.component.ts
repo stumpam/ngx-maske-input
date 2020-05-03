@@ -81,6 +81,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     precision: 2,
     separateThousands: true,
     separator: ' ',
+    emitNumber: true,
   };
 
   disabled = false;
@@ -127,7 +128,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   }
 
   onNumericInput(value: string) {
-    let updated = value?.slice(0, 15) || '';
+    let updated = value?.toString().slice(0, 15) || '';
 
     if (this.numericAdditionals) {
       updated = this.removeAdditionals(updated);
@@ -263,5 +264,8 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     if (this._options.suffix) {
       this.checkRange(value);
     }
+    this.changeFn?.(
+      this._options.emitNumber ? value.replace(/\D/g, '') : value,
+    );
   }
 }

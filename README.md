@@ -2,7 +2,6 @@
 
 Angular Date masked input for now just for numbers. It can handle string prefixes and suffixes;
 
-
 ## Quick Start
 
 1. Import NgxMaskedInputModule to your project.
@@ -28,21 +27,25 @@ export class AppModule {}
 3. Set up in parent component
 
 ```typescript
+// Except type are all fields optional
 options: DateInputOptions = {
   // For now just for numeric inputs!
   type: 'numeric';
+  // Prefix string
   prefix: string;
+  // Whether it will place a space between prefix and number
   appendPrefix: boolean;
+  // Suffix string
   suffix: string;
+  // Whether it will place a space between suffix and number
   prependSuffix: boolean;
-  float: boolean;
-  floatSeparator: string;
-  precision: number;
+  // Whether it should separate thousands
   separateThousands: boolean;
+  // Thousands separator, default <space>
   separator: string;
-  leadingZero: boolean;
-  enableEmpty: boolean;
+  // Minimum number
   min: number;
+  // Maximum number
   max: number;
 };
 ```
@@ -63,7 +66,7 @@ ngOnInit() {
 and use it in the template
 
 ```HTML
-<ngx-date-input [formControl]="formControl" [options]="to.dateOptions" [attributes]="attributes"></ngx-date-input>
+<ngx-masked-input [formControl]="formControl" [options]="to.dateOptions" [attributes]="attributes"></ngx-masked-input>
 ```
 
 > ⚠ Caution

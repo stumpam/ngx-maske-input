@@ -4,7 +4,6 @@ import {
   ElementRef,
   EventEmitter,
   forwardRef,
-  Injector,
   Input,
   OnInit,
   Output,
@@ -74,6 +73,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   disabled = false;
   touchedFn: any = null;
   changeFn: any = null;
+  private first = true;
 
   constructor(
     private readonly cd: ChangeDetectorRef,
@@ -109,6 +109,11 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
 
   onNumericInput(value: string) {
     let updated = value?.toString().slice(0, 15) || '';
+
+    if (this.first) {
+      this.first = false;
+      if (!updated && this._options.startEmpty) return;
+    }
 
     if (this.numericAdditionals) {
       updated = this.removeAdditionals(updated);

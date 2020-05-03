@@ -14,4 +14,5 @@ export interface MaskedInputOptions {
   min: number;
   max: number;
   emitNumber: boolean;
+  startEmpty: boolean;
 }

@@ -6,25 +6,15 @@ import {
   forwardRef,
   Input,
   OnInit,
+  Output,
+  EventEmitter,
   Renderer2,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { fromEvent } from 'rxjs';
-import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
 
-import {
-  MaskedInputOption,
-  MaskedInputOptions,
-  NumericOption,
-  NumericSection,
-  Section,
-  StaticOption,
-  StaticSection,
-  TextOption,
-  TextSection,
-} from '../../interfaces/masked-input.interface';
+import { MaskedInputOptions } from '../../interfaces/masked-input.interface';
 
 export const MASKED_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -34,13 +24,18 @@ export const MASKED_VALUE_ACCESSOR: any = {
 
 @Component({
   selector: 'ngx-masked-input',
-  template: '<input #field type="string" [disabled]="disabled">',
+  template: `<input
+    #field
+    type="string"
+    (blur)="onBlur()"
+    [disabled]="disabled"
+  />`,
   providers: [MASKED_VALUE_ACCESSOR],
   // tslint:disable-next-line: no-host-metadata-property
   host: {
-    '(input)': 'onInput($event.data)',
-    '(keydown)': 'keyDown($event)',
-    '(selectionChange)': 'selectionChange($event)',
+    '(input)': 'onInput($event.target.value)',
+    '(click)': 'onClick($event.target.value)',
+    '(keydown)': 'onKeyDown($event)',
   },
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,28 +43,47 @@ export const MASKED_VALUE_ACCESSOR: any = {
 export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   @ViewChild('field', { static: true }) field: ElementRef<HTMLInputElement>;
 
-  @Input() set options(options: MaskedInputOptions) {
-    if (!options.length) {
-      throw new Error('Input options has to be set!');
+  @Input() set options(options: Partial<MaskedInputOptions>) {
+    if (
+      this._options.type &&
+      options.type &&
+      this._options.type !== options.type
+    ) {
+      throw new Error('Input type cannot be updated after once is set');
     }
 
-    this.sections = this.parseOptions(options);
+    if (!this._options.type && !options.type) {
+      throw new Error('Input type must be defined');
+    }
 
-    this.generateOutput();
+    this._options = {
+      ...this._options,
+      ...options,
+    };
+
+    if (/\d/.test(this._options.prefix) || /\d/.test(this._options.suffix)) {
+      this.numericAdditionals = true;
+    }
   }
 
-  sections: Section[] = [];
-  active = false;
-  previous = '';
-  selection = [0, 0];
-  tempSelection = [0, 0];
-  activeSectionIndex = 0;
+  @Output() blurred = new EventEmitter();
+
+  numericAdditionals = false;
+  previousValue = '';
+
+  _options: Partial<MaskedInputOptions> = {
+    prependSuffix: true,
+    appendPrefix: true,
+    float: false,
+    floatSeparator: ',',
+    precision: 2,
+    separateThousands: true,
+    separator: ' ',
+  };
 
   disabled = false;
   touchedFn: any = null;
   changeFn: any = null;
-
-  reverse = false;
 
   constructor(
     private readonly cd: ChangeDetectorRef,
@@ -77,334 +91,101 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   ) {}
 
   ngOnInit(): void {
-    // const composition = merge(
-    //   fromEvent(this.field.nativeElement, 'compositionstart').pipe(
-    //     mapTo(false),
-    //   ),
-    //   fromEvent(this.field.nativeElement, 'compositionend').pipe(mapTo(true)),
-    // ).pipe(startWith(true));
-    // fromEvent(this.field.nativeElement, 'input')
-    //   .pipe
-    //   // skipUntil(composition)
-    //   ()
-    //   .subscribe(console.log);
-    fromEvent(document, 'selectionchange')
-      .pipe(
-        // skipUntil(composition),
-        map(() => document.getSelection()),
-        filter(event => event.focusNode?.contains(this.field.nativeElement)),
-        map(() => [
-          this.field.nativeElement.selectionStart,
-          this.field.nativeElement.selectionEnd,
-        ]),
-        distinctUntilChanged(
-          (prev, curr) => prev[0] === curr[0] && prev[1] === curr[1],
-        ),
-        tap(console.log),
-      )
-      .subscribe(selection => (this.selection = selection));
-  }
-
-  parseOptions(options: MaskedInputOptions): Section[] {
-    const parsers = {
-      numeric: this.parseNumericOption.bind(this),
-      text: this.parseTextOption.bind(this),
-      static: this.parseStaticOption.bind(this),
-    };
-
-    return options.map((section: MaskedInputOption, index: number) =>
-      parsers[section.type](section, index),
-    );
-  }
-
-  parseNumericOption(section: NumericOption, index: number): NumericSection {
-    if (section.value !== void 0) {
-      (section as any).value = this.checkMinMax(section);
-
-      return {
-        ...section,
-        show: section.value !== void 0 ? section.value.toString() : '',
-        valid: !!section.value,
-        filled: this.isNumericFilled(section, 'value'),
-        index,
-      };
+    if (!this._options.type) {
+      throw new Error('Input type must be defined');
     }
-
-    return { ...section, show: '', valid: false, filled: false, index };
-  }
-
-  parseTextOption(section: TextOption, index: number): TextSection {
-    return {
-      ...section,
-      show: section.value,
-      valid: false,
-      filled: false,
-      index,
-    };
-  }
-
-  parseStaticOption(section: StaticOption, index: number): StaticSection {
-    return {
-      ...section,
-      show: section.value,
-      valid: true,
-      filled: true,
-      index,
-    };
-  }
-
-  checkNumericValidity(section: NumericOption): boolean {
-    return (
-      section.value &&
-      section.value < section.max &&
-      section.value > section.min
-    );
-  }
-
-  isNumericFilled(section: NumericOption, value: 'value' | 'show'): boolean {
-    if (section.value < 0) {
-      if (section.min) {
-        return (
-          section.min.toString().length === section[value].toString().length
-        );
-      }
-    } else {
-      if (section.max) {
-        return (
-          section.max.toString().length === section[value].toString().length
-        );
-      }
-    }
-
-    return false;
   }
 
   onInput(value: string) {
-    const sections = this.getSectionsBySelection(!!value);
-
-    sections.forEach(section => this.sectionUpdate(value, section));
-
-    // if (this.selection[0] === this.selection[1]) {
-    //   this.appendValue(value);
-    //   console.log(this.getSectionsBySelection());
-    // }
-
-    this.reverse = false;
-
-    this.generateOutput();
-  }
-
-  sectionUpdate(value: string, section: Section) {
-    const processors = {
-      numeric: this.processNumericSection.bind(this),
-      text: this.processTextSection.bind(this),
-      static: this.processStaticSection.bind(this),
-    };
-
-    if (section.hideUntouched) {
-      section = this.getNextNotHidden(section);
+    if (this._options.type === 'numeric') {
+      this.onNumericInput(value);
     }
-
-    processors[section.type](value, section);
   }
 
-  getNextNotHidden(section: Section) {
-    let next = false;
-
-    const found = this.sections.find(s => {
-      if (s === section) next = true;
-
-      return next && !s.hideUntouched;
-    });
-
-    return found || this.sections[this.sections.length - 1];
+  onClick(value: string) {
+    if (this._options.type === 'numeric') {
+      this.checkRange(value);
+    }
   }
 
-  // appendValue(value: string) {
-  //   const processors = {
-  //     numeric: this.processNumericSection.bind(this),
-  //     text: this.processTextSection.bind(this),
-  //     static: this.processStaticSection.bind(this),
-  //   };
-
-  //   let i = 0;
-  //   while (value && i < 100) {
-  //     const section = this.sections[i];
-  //     if (!section.filled) {
-  //       value = processors[section.type](value, section);
-  //     }
-
-  //     if (this.sections.length - 1 === i) {
-  //       value = '';
-  //     }
-
-  //     i++;
-  //   }
-  // }
-
-  getSelectionInSection(section: Section, value: boolean): [number, number] {
-    let selectionStart = this.selection[0];
-    let selectionEnd = this.selection[1];
-    let length = 0;
-    // console.log(this.selection);
-
-    this.sections.find(s => {
-      const isDesiredSection = s === section;
-      length = s.show.length;
-
-      if (!isDesiredSection) {
-        selectionStart = selectionStart - length;
-        selectionEnd = selectionEnd - length;
+  onKeyDown(event: KeyboardEvent) {
+    if (this._options.type === 'numeric') {
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        this.checkRange((event.target as HTMLInputElement).value, true);
       }
-
-      return isDesiredSection;
-    });
-
-    if (selectionStart <= 0) {
-      selectionStart = 0;
     }
-
-    if (selectionEnd > length + 1) {
-      selectionEnd = length + 1;
-    }
-
-    return [selectionStart, selectionEnd];
   }
 
-  getSectionsBySelection(forward: boolean): Section[] {
-    let length = 0;
-    const modify = forward ? 0 : 1;
+  onNumericInput(value: string) {
+    let updated = value?.slice(0, 15) || '';
 
-    const found = this.sections.filter(section => {
-      const condition =
-        length <= this.selection[0] - modify &&
-        length + section.show.length >= this.selection[1] - modify;
-
-      length = length + section.show.length;
-      return condition;
-    });
-
-    return found.length ? found : [this.sections[0]];
-  }
-
-  processNumericSection(value: string, section: NumericSection) {
-    if (Number.isNaN(+value)) return;
-
-    const selection = this.getSelectionInSection(section, value === void 0);
-
-    section.show = this.replaceText(value, section, selection, true);
-    const num = !section.show && !section.showZero ? void 0 : +section.show;
-
-    section.filled = this.isNumericFilled(section, 'show');
-
-    section.show = section.filled
-      ? this.checkMinMax(section, num).toString()
-      : num === void 0
-      ? ''
-      : num.toString();
-  }
-
-  processTextSection(value: string, section: TextSection): string {
-    return value;
-  }
-
-  processStaticSection(value: string, section: StaticSection): string {
-    return value;
-  }
-
-  replaceText(
-    value: string | null,
-    section: Section,
-    selection: [number, number],
-    checkZero = false,
-  ): string {
-    let retVal = '';
-    let selectionStart = 0;
-    let selectionEnd = 0;
-
-    if (value === null) {
-      const equal = selection[0] === selection[1];
-
-      retVal =
-        section.show.slice(0, selection[0] - (this.reverse ? 0 : 1)) +
-        section.show.slice(selection[1] + 1 - (this.reverse ? 0 : 1));
-
-      selectionStart = selection[0] - 1;
-      selectionEnd = selectionStart;
-
-      // console.log(selection, selectionStart, selectionEnd);
-
-      // if (selection[0] === selection[1]) {
-      //   retVal =
-      //     section.show.slice(0, selection[0] - 1 + (this.reverse ? 1 : 0)) +
-      //     section.show.slice(selection[1] + (this.reverse ? 1 : 0));
-      // } else {
-      //   retVal =
-      //     section.show.slice(0, selection[0]) +
-      //     section.show.slice(selection[1] + 1);
-      // }
+    if (this.numericAdditionals) {
+      updated = this.removeAdditionals(updated);
     } else {
-      retVal =
-        checkZero && section.show === '0'
-          ? value
-          : section.show.slice(0, selection[0]) +
-            value +
-            section.show.slice(selection[1]);
-
-      selectionStart = selection[0] + 1;
-      selectionEnd = selectionStart;
-    }
-
-    this.setSelection([selectionStart, selectionEnd], section.index);
-
-    return retVal;
-  }
-
-  checkMinMax(section: NumericSection, value: number): number;
-  checkMinMax(section: NumericOption): number;
-  checkMinMax(section: NumericSection, value?: number): number {
-    let num = value !== void 0 ? value : +section.value;
-
-    if (num !== void 0 && section.min && num < section.min) {
-      if (section.modifyMin) {
-        num = section.min;
-      } else {
-        num = +num.toString().slice(0, section.min.toString().length);
-        section.valid = false;
+      if (!this._options.float) {
+        updated = updated.replace(/\D/g, '');
       }
     }
 
-    if (num !== void 0 && section.max && num > section.max) {
-      if (section.modifyMax) {
-        num = section.max;
-      } else {
-        num = +num.toString().slice(0, section.max.toString().length);
-        section.valid = false;
+    if (!updated && !this._options.enableEmpty) {
+      updated = '0';
+    }
+
+    if (!this._options.leadingZero) {
+      updated = parseInt(updated, 10).toString();
+    }
+
+    if (this._options.separateThousands) {
+      updated = [...updated]
+        .reverse()
+        .map((d, i) => (i % 3 === 0 ? d + this._options.separator : d))
+        .reverse()
+        .join('')
+        .trim();
+    }
+
+    if (this._options.suffix) {
+      updated = `${updated}${this._options.prependSuffix ? ' ' : ''}${
+        this._options.suffix
+      }`;
+    }
+
+    if (this._options.prefix) {
+      updated = `${this._options.prefix}${
+        this._options.appendPrefix ? ' ' : ''
+      }${updated}`;
+    }
+
+    this.updateValue(updated);
+  }
+
+  removeAdditionals(value: string): string {
+    let cleaned = value.replace(/\s/g, '');
+
+    if (this._options.prefix) {
+      let prefix = [...this._options.prefix];
+      while (prefix.length) {
+        const [char, ...rest] = prefix;
+
+        if (cleaned[0] === char) {
+          cleaned = [...cleaned].splice(1).join('');
+        }
+
+        prefix = rest;
       }
     }
 
-    return num;
-  }
+    // if (this._options.suffix) {
+    //   const suffix = [...this._options.suffix];
+    //   while (suffix.length) {
+    //     const char = suffix.slice(1);
+    //     const rest = suffix.slice(0, -1);
 
-  // onClick(value: string) {
-  //   if (this._options.type === 'numeric') {
-  //     this.checkRange(value);
-  //   }
-  // }
-
-  keyDown(event: KeyboardEvent) {
-    this.active = true;
-
-    if (event.key === 'Delete') {
-      this.reverse = true;
-    }
-
-    // console.log(event);
-    // if (this._options.type === 'numeric') {
-    //   if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-    //     this.checkRange((event.target as HTMLInputElement).value, true);
+    //     console.log(char, rest);
     //   }
     // }
+
+    return cleaned;
   }
 
   writeValue(value: string): void {
@@ -424,49 +205,53 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     this.cd.markForCheck();
   }
 
-  generateOutput() {
-    const value = this.sections.reduce(
-      (output, section) =>
-        output + (section.hideUntouched && !this.active ? '' : section.show),
-      '',
-    );
-    this.updateValue(value);
+  checkRange(value: string, key = false) {
+    const suffixPosition =
+      value.length -
+      (this._options.suffix?.length + +this._options.prependSuffix) -
+      (key ? 1 : 0);
+
+    const prefixPosition =
+      this._options.prefix?.length + +this._options.appendPrefix;
+
+    if (this.field.nativeElement.selectionStart > suffixPosition) {
+      this.field.nativeElement.setSelectionRange(
+        suffixPosition,
+        suffixPosition,
+      );
+    }
+
+    if (this.field.nativeElement.selectionStart <= prefixPosition) {
+      this.field.nativeElement.setSelectionRange(
+        prefixPosition + (key ? 1 : 0),
+        prefixPosition + (key ? 1 : 0),
+      );
+    }
   }
 
-  setSelection(range: [number, number], index: number) {
-    const selection = [0, 0];
-    this.sections.find(section => {
-      const condition = section.index === index;
+  onBlur() {
+    if (
+      this._options.min &&
+      +this.field.nativeElement.value.replace(/\D/g, '') < this._options.min
+    ) {
+      this.onInput(this._options.min.toString());
+    }
 
-      if (section.index < index) {
-        const length =
-          section.hideUntouched && !this.active ? 0 : section.show.length;
+    if (
+      this._options.max &&
+      +this.field.nativeElement.value.replace(/\D/g, '') > this._options.max
+    ) {
+      this.onInput(this._options.max.toString());
+    }
 
-        selection[0] = selection[0] + length;
-        selection[1] = selection[1] + length;
-      }
-
-      if (condition) {
-        selection[0] = selection[0] + range[0];
-        selection[1] = selection[1] + range[1];
-      }
-
-      return condition;
-    });
-
-    this.tempSelection = selection;
-    console.log(this.tempSelection);
+    this.blurred.emit();
   }
 
   updateValue(value: string) {
-    this.previous = value;
+    this.previousValue = value;
     this.renderer.setProperty(this.field.nativeElement, 'value', value);
-
-    this.field.nativeElement.setSelectionRange(
-      this.tempSelection[0],
-      this.tempSelection[1],
-    );
-
-    this.selection = this.tempSelection;
+    if (this._options.suffix) {
+      this.checkRange(value);
+    }
   }
 }

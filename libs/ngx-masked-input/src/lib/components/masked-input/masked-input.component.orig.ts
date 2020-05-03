@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { MaskedInputOptions } from '../../interfaces/masked-input.oriiginal.interface';
+import { MaskedInputOptions } from '../../interfaces/masked-input.interface.original';
 
 export const MASKED_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,

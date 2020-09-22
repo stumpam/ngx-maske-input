@@ -108,7 +108,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   }
 
   onNumericInput(value: string) {
-    let updated = value?.toString().slice(0, 15) || '';
+    let updated = value;
 
     if (this.first) {
       this.first = false;
@@ -128,7 +128,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     }
 
     if (!this._options.leadingZero) {
-      updated = parseInt(updated, 10).toString();
+      updated = updated.replace(/\b0+/g, '');
     }
 
     if (this._options.separateThousands) {

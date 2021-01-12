@@ -147,7 +147,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     }
 
     if (this._options.prefix) {
-      updated = `${this.options.prefix}${
+      updated = `${this._options.prefix}${
         this._options.appendPrefix ? ' ' : ''
       }${updated}`;
     }

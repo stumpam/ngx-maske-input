@@ -147,7 +147,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     }
 
     if (this._options.prefix) {
-      updated = `${this._options.prefix}${
+      updated = `${this.options.prefix}${
         this._options.appendPrefix ? ' ' : ''
       }${updated}`;
     }
@@ -242,7 +242,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
       this.onInput(this._options.max.toString());
     }
 
-    this.touchedFn();
+    this.touchedFn?.();
   }
 
   updateValue(value: string) {

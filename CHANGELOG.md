@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.2](https://github.com/stumpam/ngx-masked-input/compare/v3.0.1...v3.0.2) (2021-01-12)
+
+
+### Bug Fixes
+
+* put back wrongly deleted underscore ([79bc6d7](https://github.com/stumpam/ngx-masked-input/commit/79bc6d70dc2aa3d82dacee3b654309bb52aeb60a))
+
 ### [3.0.1](https://github.com/stumpam/ngx-masked-input/compare/v3.0.0...v3.0.1) (2021-01-12)
 
 

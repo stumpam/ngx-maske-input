@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.1.1](https://github.com/stumpam/ngx-masked-input/compare/v3.1.0...v3.1.1) (2021-03-24)
+
+
+### Bug Fixes
+
+* ignore null value ([3310cb4](https://github.com/stumpam/ngx-masked-input/commit/3310cb4fecf0ee5ba637afad676c4d5352e7f7fd))
+
 ## [3.1.0](https://github.com/stumpam/ngx-masked-input/compare/v3.0.1...v3.1.0) (2021-03-24)
 
 

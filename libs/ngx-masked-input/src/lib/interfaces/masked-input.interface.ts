@@ -15,4 +15,5 @@ export interface MaskedInputOptions {
   max: number;
   emitNumber: boolean;
   startEmpty: boolean;
+  formatZip: boolean;
 }

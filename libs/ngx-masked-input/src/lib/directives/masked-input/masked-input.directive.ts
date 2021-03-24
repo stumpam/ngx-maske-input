@@ -49,6 +49,11 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
       ...options,
     };
 
+    if (this._options.formatZip) {
+      this._options.min = 1e4;
+      this._options.max = 79999;
+    }
+
     if (/\d/.test(this._options.prefix) || /\d/.test(this._options.suffix)) {
       this.numericAdditionals = true;
     }
@@ -120,6 +125,14 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     } else {
       if (!this._options.float) {
         updated = updated.replace(/\D/g, '');
+
+        if (this._options.max) {
+          const maxLng = this._options.max.toString().length;
+
+          if (updated.length > maxLng) {
+            updated = updated.slice(0, maxLng);
+          }
+        }
       }
     }
 
@@ -138,6 +151,11 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
         .reverse()
         .join('')
         .trim();
+    } else if (this._options.formatZip) {
+      updated =
+        updated.length > 3
+          ? `${updated.slice(0, 3)} ${updated.slice(3)}`
+          : updated;
     }
 
     if (this._options.suffix) {
@@ -170,16 +188,6 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
         prefix = rest;
       }
     }
-
-    // if (this._options.suffix) {
-    //   const suffix = [...this._options.suffix];
-    //   while (suffix.length) {
-    //     const char = suffix.slice(1);
-    //     const rest = suffix.slice(0, -1);
-
-    //     console.log(char, rest);
-    //   }
-    // }
 
     return cleaned;
   }
@@ -248,9 +256,11 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   updateValue(value: string) {
     this.previousValue = value;
     this.renderer.setProperty(this.field.nativeElement, 'value', value);
+
     if (this._options.suffix) {
       this.checkRange(value);
     }
+
     this.changeFn?.(
       this._options.emitNumber ? value.replace(/\D/g, '') : value,
     );

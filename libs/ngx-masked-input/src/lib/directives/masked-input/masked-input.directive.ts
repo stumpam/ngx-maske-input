@@ -107,10 +107,10 @@ export class MaskedInputDirective implements ControlValueAccessor {
     }
   }
 
-  onNumericInput(value: string | null) {
+  onNumericInput(value: string | number | null) {
     if (!value) return;
 
-    let updated = value;
+    let updated = value.toString();
 
     if (this.first) {
       this.first = false;

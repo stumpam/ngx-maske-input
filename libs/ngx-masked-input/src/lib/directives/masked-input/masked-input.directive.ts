@@ -13,9 +13,9 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { MaskedInputOptions } from '../../interfaces/masked-input.interface';
 
-export const MASKED_VALUE_ACCESSOR: any = {
+const MASKED_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
-  useExisting: forwardRef(() => MaskedInputComponent),
+  useExisting: forwardRef(() => MaskedInputDirective),
   multi: true,
 };
 
@@ -30,7 +30,7 @@ export const MASKED_VALUE_ACCESSOR: any = {
   },
   providers: [MASKED_VALUE_ACCESSOR],
 })
-export class MaskedInputComponent implements ControlValueAccessor, OnInit {
+export class MaskedInputDirective implements ControlValueAccessor, OnInit {
   @Input() set options(options: Partial<MaskedInputOptions>) {
     if (
       this._options.type &&
@@ -99,6 +99,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
   }
 
   onClick(value: string) {
+    this.touchedFn?.();
     if (this._options.type === 'numeric') {
       this.checkRange(value);
     }
@@ -257,6 +258,7 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
 
   updateValue(value: string) {
     this.previousValue = value;
+    this.renderer.setProperty(this.field.nativeElement, 'value', value);
 
     if (this._options.suffix) {
       this.checkRange(value);
@@ -267,6 +269,5 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
       : value;
 
     this.changeFn?.(newValue);
-    this.renderer.setProperty(this.field.nativeElement, 'value', value);
   }
 }

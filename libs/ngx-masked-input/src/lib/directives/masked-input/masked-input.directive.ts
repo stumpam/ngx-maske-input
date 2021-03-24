@@ -112,7 +112,9 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
     }
   }
 
-  onNumericInput(value: string) {
+  onNumericInput(value: string | null) {
+    if (!value) return;
+
     let updated = value;
 
     if (this.first) {
@@ -255,14 +257,16 @@ export class MaskedInputComponent implements ControlValueAccessor, OnInit {
 
   updateValue(value: string) {
     this.previousValue = value;
-    this.renderer.setProperty(this.field.nativeElement, 'value', value);
 
     if (this._options.suffix) {
       this.checkRange(value);
     }
 
-    this.changeFn?.(
-      this._options.emitNumber ? value.replace(/\D/g, '') : value,
-    );
+    const newValue = this._options.emitNumber
+      ? value.replace(/\D/g, '')
+      : value;
+
+    this.changeFn?.(newValue);
+    this.renderer.setProperty(this.field.nativeElement, 'value', value);
   }
 }

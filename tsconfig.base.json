@@ -16,10 +16,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@stumpam/ngx-masked-input": [
-        "libs/ngx-masked-input/src/index.ts"
-      ]
+      "@stumpam/ngx-masked-input": ["libs/ngx-masked-input/src/index.ts"]
     }
+  },
+  "angularCompilerOptions": {
+    "disableTypeScriptVersionCheck": true
   },
   "exclude": ["node_modules", "tmp"]
 }

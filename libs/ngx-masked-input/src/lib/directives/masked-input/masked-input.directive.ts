@@ -5,7 +5,6 @@ import {
   EventEmitter,
   forwardRef,
   Input,
-  OnInit,
   Output,
   Renderer2,
 } from '@angular/core';
@@ -30,7 +29,7 @@ const MASKED_VALUE_ACCESSOR: any = {
   },
   providers: [MASKED_VALUE_ACCESSOR],
 })
-export class MaskedInputDirective implements ControlValueAccessor, OnInit {
+export class MaskedInputDirective implements ControlValueAccessor {
   @Input() set options(options: Partial<MaskedInputOptions>) {
     if (
       this._options.type &&
@@ -65,6 +64,7 @@ export class MaskedInputDirective implements ControlValueAccessor, OnInit {
   previousValue = '';
 
   _options: Partial<MaskedInputOptions> = {
+    type: 'numeric',
     prependSuffix: true,
     appendPrefix: true,
     float: false,
@@ -85,12 +85,6 @@ export class MaskedInputDirective implements ControlValueAccessor, OnInit {
     private readonly renderer: Renderer2,
     private readonly field: ElementRef<HTMLInputElement>,
   ) {}
-
-  ngOnInit(): void {
-    if (!this._options.type) {
-      throw new Error('Input type must be defined');
-    }
-  }
 
   onInput(value: string) {
     if (this._options.type === 'numeric') {

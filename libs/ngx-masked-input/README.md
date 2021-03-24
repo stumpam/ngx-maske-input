@@ -29,7 +29,7 @@ export class AppModule {}
 ```typescript
 // Except type are all fields optional
 options: MaskedInputOptions = {
-  // For now just for numeric inputs!
+  // For now just for numeric inputs! Default value, is not necessary to set.
   type: 'numeric';
   // Prefix string
   prefix: string;

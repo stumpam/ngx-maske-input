@@ -108,7 +108,7 @@ export class MaskedInputDirective implements ControlValueAccessor {
   }
 
   onNumericInput(value: string | number | null) {
-    if (!value) return;
+    if (!value && value !== 0) return;
 
     let updated = value.toString();
 
@@ -166,6 +166,7 @@ export class MaskedInputDirective implements ControlValueAccessor {
         this._options.appendPrefix ? ' ' : ''
       }${updated}`;
     }
+
 
     this.updateValue(updated);
   }

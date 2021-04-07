@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.1.7](https://github.com/stumpam/ngx-masked-input/compare/v3.1.6...v3.1.7) (2021-04-07)
+
+
+### Bug Fixes
+
+* remove touch event from click ([3c00092](https://github.com/stumpam/ngx-masked-input/commit/3c000923dc15f3afd5bf89632dc38690c5b42cbe))
+
 ### [3.1.6](https://github.com/stumpam/ngx-masked-input/compare/v3.1.5...v3.1.6) (2021-04-06)
 
 

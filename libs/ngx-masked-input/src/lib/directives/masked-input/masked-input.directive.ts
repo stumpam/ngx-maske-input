@@ -93,7 +93,6 @@ export class MaskedInputDirective implements ControlValueAccessor {
   }
 
   onClick(value: string) {
-    this.touchedFn?.();
     if (this._options.type === 'numeric') {
       this.checkRange(value);
     }

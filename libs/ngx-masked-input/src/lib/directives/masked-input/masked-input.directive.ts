@@ -73,6 +73,7 @@ export class MaskedInputDirective implements ControlValueAccessor {
     separateThousands: true,
     separator: ' ',
     emitNumber: true,
+    ignoreEdgeOnBlur: false,
   };
 
   disabled = false;
@@ -107,7 +108,13 @@ export class MaskedInputDirective implements ControlValueAccessor {
   }
 
   onNumericInput(value: string | number | null) {
-    if (!value && value !== 0) return;
+    if (!value && value !== 0) {
+      this._options.ignoreEdgeOnBlur
+        ? this.updateValue(undefined)
+        : this.onNumericInput(this.previousValue);
+
+      return;
+    }
 
     let updated = value.toString();
 
@@ -165,7 +172,6 @@ export class MaskedInputDirective implements ControlValueAccessor {
         this._options.appendPrefix ? ' ' : ''
       }${updated}`;
     }
-
 
     this.updateValue(updated);
   }
@@ -233,16 +239,20 @@ export class MaskedInputDirective implements ControlValueAccessor {
   }
 
   onBlur() {
+    const value = +this.field.nativeElement.value.replace(/\D/g, '');
+
     if (
       this._options.min &&
-      +this.field.nativeElement.value.replace(/\D/g, '') < this._options.min
+      !this._options.ignoreEdgeOnBlur &&
+      value < this._options.min
     ) {
       this.onInput(this._options.min.toString());
     }
 
     if (
       this._options.max &&
-      +this.field.nativeElement.value.replace(/\D/g, '') > this._options.max
+      !this._options.ignoreEdgeOnBlur &&
+      value > this._options.max
     ) {
       this.onInput(this._options.max.toString());
     }
@@ -252,15 +262,14 @@ export class MaskedInputDirective implements ControlValueAccessor {
 
   updateValue(value: string) {
     this.previousValue = value;
-    this.renderer.setProperty(this.field.nativeElement, 'value', value);
+    this.renderer.setProperty(this.field.nativeElement, 'value', value ?? '');
 
     if (this._options.suffix) {
       this.checkRange(value);
     }
 
-    const newValue = this._options.emitNumber
-      ? value.replace(/\D/g, '')
-      : value;
+    const newValue =
+      value && this._options.emitNumber ? value.replace(/\D/g, '') : value;
 
     this.changeFn?.(newValue);
   }

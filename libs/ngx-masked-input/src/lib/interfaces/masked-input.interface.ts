@@ -16,4 +16,5 @@ export interface MaskedInputOptions {
   emitNumber: boolean;
   startEmpty: boolean;
   formatZip: boolean;
+  ignoreEdgeOnBlur: boolean;
 }

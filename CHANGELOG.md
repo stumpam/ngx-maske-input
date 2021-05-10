@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/stumpam/ngx-masked-input/compare/v3.1.7...v3.2.0) (2021-05-10)
+
+
+### Features
+
+* add options to return undefined when empty ([47e63dd](https://github.com/stumpam/ngx-masked-input/commit/47e63dd0ea887683119315f2286e3a4cb74389a3))
+
 ### [3.1.7](https://github.com/stumpam/ngx-masked-input/compare/v3.1.6...v3.1.7) (2021-04-07)
 
 

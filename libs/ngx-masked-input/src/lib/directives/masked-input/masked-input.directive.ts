@@ -161,7 +161,7 @@ export class MaskedInputDirective implements ControlValueAccessor {
           : updated;
     }
 
-    if (this._options.suffix) {
+    if (this._options.suffix && updated.trim()) {
       updated = `${updated}${this._options.prependSuffix ? ' ' : ''}${
         this._options.suffix
       }`;
@@ -264,7 +264,7 @@ export class MaskedInputDirective implements ControlValueAccessor {
     this.previousValue = value;
     this.renderer.setProperty(this.field.nativeElement, 'value', value ?? '');
 
-    if (this._options.suffix) {
+    if (this._options.suffix && value) {
       this.checkRange(value);
     }
 

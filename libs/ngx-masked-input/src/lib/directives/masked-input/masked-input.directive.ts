@@ -109,9 +109,15 @@ export class MaskedInputDirective implements ControlValueAccessor {
 
   onNumericInput(value: string | number | null) {
     if (!value && value !== 0) {
-      this._options.ignoreEdgeOnBlur
-        ? this.updateValue(undefined)
-        : this.onNumericInput(this.previousValue);
+      if (this._options.ignoreEdgeOnBlur) {
+        this.updateValue(undefined);
+      } else if (value !== '') {
+        this.onNumericInput(this.previousValue);
+      }
+
+      if (this._options.enableEmpty) {
+        this.updateValue('');
+      }
 
       return;
     }

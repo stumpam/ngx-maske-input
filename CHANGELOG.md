@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.2.3](https://github.com/stumpam/ngx-masked-input/compare/v3.2.1...v3.2.3) (2021-05-20)
+
+
+### Bug Fixes
+
+* empty input will no longer exceed call stack ([fef98d7](https://github.com/stumpam/ngx-masked-input/commit/fef98d768177406ea82665d91c506ab80677aded))
+* keep min or last value on deletion ([79e124e](https://github.com/stumpam/ngx-masked-input/commit/79e124e15da3d0af357444c9501a1cfe22beddf0))
+
 ### [3.2.2](https://github.com/stumpam/ngx-masked-input/compare/v3.2.1...v3.2.2) (2021-05-18)
 
 

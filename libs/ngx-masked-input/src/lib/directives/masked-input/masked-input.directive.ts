@@ -245,7 +245,12 @@ export class MaskedInputDirective implements ControlValueAccessor {
   }
 
   onBlur() {
-    const value = +this.field.nativeElement.value.replace(/\D/g, '');
+    const elValue = this.field.nativeElement.value;
+    let value = +elValue.replace(/\D/g, '');
+
+    if (elValue === '' && !this._options.enableEmpty) {
+      value = this._options.min ?? +this.previousValue;
+    }
 
     if (
       this._options.min &&
@@ -261,6 +266,10 @@ export class MaskedInputDirective implements ControlValueAccessor {
       value > this._options.max
     ) {
       this.onInput(this._options.max.toString());
+    }
+
+    if (elValue === '' && !this._options.enableEmpty) {
+      this.onInput(value.toString());
     }
 
     this.touchedFn?.();

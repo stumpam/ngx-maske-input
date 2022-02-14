@@ -1,7 +1,7 @@
 {
   "name": "@stumpam/ngx-masked-input",
   "license": "MIT",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Angular Date picker with masked input.",
   "homepage": "https://github.com/stumpam/ngx-masked-input",
   "author": "Martin Štumpa (https://github.com/stumpam)",
@@ -24,8 +24,8 @@
     "url": "https://github.com/stumpam/ngx-masked-input/issues"
   },
   "peerDependencies": {
-    "@angular/common": "^9.0.0",
-    "@angular/core": "^9.0.0",
-    "tslib": "^1.10.0"
+    "@angular/common": ">=13.0.0",
+    "@angular/core": ">=13.0.0",
+    "tslib": ">=2.0.0"
   }
 }

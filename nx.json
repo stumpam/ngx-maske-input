@@ -10,20 +10,6 @@
     "nx.json": "*",
     "tsconfig.base.json": "*"
   },
-  "projects": {
-    "demo": {
-      "tags": []
-    },
-    "demo-e2e": {
-      "tags": [],
-      "implicitDependencies": [
-        "demo"
-      ]
-    },
-    "ngx-masked-input": {
-      "tags": []
-    }
-  },
   "affected": {
     "defaultBase": "master"
   },
@@ -36,7 +22,8 @@
           "lint",
           "test",
           "e2e"
-        ]
+        ],
+        "parallel": 1
       }
     }
   },
@@ -53,5 +40,13 @@
     "@nrwl/angular:library": {
       "unitTestRunner": "jest"
     }
+  },
+  "targetDependencies": {
+    "build": [
+      {
+        "target": "build",
+        "projects": "dependencies"
+      }
+    ]
   }
 }

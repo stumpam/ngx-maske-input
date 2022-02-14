@@ -1,23 +1,23 @@
-name: Npm Publish
+name: yarn Publish
 
 on:
   release:
     types: [published]
 
 jobs:    
-  publish-npm:
+  publish-yarn:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: 10.x
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm run build ngx-masked-input
-      - run: npm publish dist/libs/ngx-masked-input --access public
+          registry-url: https://registry.yarnjs.org/
+      - run: yarn
+      - run: yarn run build ngx-masked-input
+      - run: yarn publish dist/libs/ngx-masked-input --access public
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{secrets.yarn_token}}
 
   publish-gpr:
     runs-on: ubuntu-latest
@@ -26,9 +26,9 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 10.x
-          registry-url: https://npm.pkg.github.com/
-      - run: npm ci
-      - run: npm run build ngx-masked-input
-      - run: npm publish dist/libs/ngx-masked-input
+          registry-url: https://yarn.pkg.github.com/
+      - run: yarn
+      - run: yarn run build ngx-masked-input
+      - run: yarn publish dist/libs/ngx-masked-input
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

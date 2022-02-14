@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 10.x
+          node-version: 17
           registry-url: https://registry.yarnjs.org/
       - run: yarn
       - run: yarn run build ngx-masked-input
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 10.x
+          node-version: 17
           registry-url: https://yarn.pkg.github.com/
       - run: yarn
       - run: yarn run build ngx-masked-input

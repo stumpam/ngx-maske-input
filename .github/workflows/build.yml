@@ -16,6 +16,6 @@ jobs:
     - name: Run node
       uses: actions/setup-node@v1
       with:
-        node-version: '10.x'
+        node-version: '17'
     - run: yarn
     - run: yarn run build ngx-masked-input

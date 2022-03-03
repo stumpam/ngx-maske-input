@@ -14,7 +14,7 @@ jobs:
           node-version: 17
           registry-url: https://registry.npmjs.org/
       - run: yarn
-      - run: yarn run build ngx-masked-input
+      - run: yarn run build ngx-masked-input --prod
       - run: yarn publish dist/libs/ngx-masked-input --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
@@ -29,6 +29,6 @@ jobs:
           registry-url: https://npm.pkg.github.com/
       - run: yarn
       - run: yarn run build ngx-masked-input
-      - run: yarn publish dist/libs/ngx-masked-input
+      - run: yarn publish dist/libs/ngx-masked-input --prod
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

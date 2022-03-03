@@ -18,4 +18,4 @@ jobs:
       with:
         node-version: '17'
     - run: yarn
-    - run: yarn run build ngx-masked-input
+    - run: yarn run build ngx-masked-input --prod

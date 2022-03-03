@@ -14,12 +14,14 @@
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "strict": true,
     "baseUrl": ".",
     "paths": {
       "@stumpam/ngx-masked-input": ["libs/ngx-masked-input/src/index.ts"]
     }
   },
   "angularCompilerOptions": {
+    "strictTemplates": true,
     "disableTypeScriptVersionCheck": true
   },
   "exclude": ["node_modules", "tmp"]

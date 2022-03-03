@@ -53,7 +53,10 @@ export class MaskedInputDirective implements ControlValueAccessor {
       this._options.max = 79999;
     }
 
-    if (/\d/.test(this._options.prefix) || /\d/.test(this._options.suffix)) {
+    if (
+      (this._options?.prefix && /\d/.test(this._options.prefix)) ||
+      (this._options?.suffix && /\d/.test(this._options.suffix))
+    ) {
       this.numericAdditionals = true;
     }
   }
@@ -61,7 +64,7 @@ export class MaskedInputDirective implements ControlValueAccessor {
   @Output() blurred = new EventEmitter();
 
   numericAdditionals = false;
-  previousValue = '';
+  previousValue: string | undefined = '';
 
   _options: Partial<MaskedInputOptions> = {
     type: 'numeric',
@@ -107,7 +110,7 @@ export class MaskedInputDirective implements ControlValueAccessor {
     }
   }
 
-  onNumericInput(value: string | number | null) {
+  onNumericInput(value?: string | number | null) {
     if (!value && value !== 0) {
       if (this._options.ignoreEdgeOnBlur) {
         this.updateValue(undefined);
@@ -223,20 +226,21 @@ export class MaskedInputDirective implements ControlValueAccessor {
 
     const suffixPosition =
       value.length -
-      (this._options.suffix?.length + +this._options.prependSuffix) -
+      ((this._options.suffix?.length || 0) +
+        +(this._options.prependSuffix || 0)) -
       (key ? 1 : 0);
 
     const prefixPosition =
-      this._options.prefix?.length + +this._options.appendPrefix;
+      (this._options.prefix?.length || 0) + +(this._options.appendPrefix || 0);
 
-    if (this.field.nativeElement.selectionStart > suffixPosition) {
+    if ((this.field.nativeElement.selectionStart || -1) > suffixPosition) {
       this.field.nativeElement.setSelectionRange(
         suffixPosition,
         suffixPosition,
       );
     }
 
-    if (this.field.nativeElement.selectionStart <= prefixPosition) {
+    if ((this.field.nativeElement.selectionStart || 9e4) <= prefixPosition) {
       this.field.nativeElement.setSelectionRange(
         prefixPosition + (key ? 1 : 0),
         prefixPosition + (key ? 1 : 0),
@@ -249,7 +253,7 @@ export class MaskedInputDirective implements ControlValueAccessor {
     let value = +elValue.replace(/\D/g, '');
 
     if (elValue === '' && !this._options.enableEmpty) {
-      value = this._options.min ?? +this.previousValue;
+      value = this._options.min ?? +(this.previousValue || 0);
     }
 
     if (
@@ -275,7 +279,7 @@ export class MaskedInputDirective implements ControlValueAccessor {
     this.touchedFn?.();
   }
 
-  updateValue(value: string) {
+  updateValue(value?: string) {
     this.previousValue = value;
     this.renderer.setProperty(this.field.nativeElement, 'value', value ?? '');
 
